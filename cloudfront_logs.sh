@@ -83,11 +83,12 @@ process_logs() {
         status_color = status
       }
       
-      # Color IP addresses (different colors for different ranges)
+      # Color IP addresses (different colors for different ranges) and pad them
+      padded_ip = sprintf("%-15s", client_ip)
       if (match(client_ip, /^192\.168\.|^10\.|^172\.(1[6-9]|2[0-9]|3[01])\./)) {
-        ip_color = yellow client_ip reset  # Private IPs
+        ip_color = yellow padded_ip reset  # Private IPs
       } else {
-        ip_color = salmon client_ip reset  # Public IPs
+        ip_color = salmon padded_ip reset  # Public IPs
       }
       
       # Color endpoint
@@ -99,7 +100,7 @@ process_logs() {
       # Color method
       method_color = purple method reset
       
-      printf "%-8s | %-15s | %s | %s | %-8s | %s | %s\n", local_time, ip_color, status_color, method_color, bytes, endpoint_color, ua_color
+      printf "%-8s | %s | %3s | %-6s | %4s | %-30s | %s\n", local_time, ip_color, status_color, method_color, bytes, endpoint_color, ua_color
     }' | sort
 }
 
