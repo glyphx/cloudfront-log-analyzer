@@ -99,7 +99,18 @@ process_logs() {
     }' | sort
 }
 
+get_available_environments() {
+    local envs=""
+    if [ -n "${PROD_S3_BUCKET:-}" ]; then envs="${envs}prod "; fi
+    if [ -n "${STAGING_S3_BUCKET:-}" ]; then envs="${envs}staging "; fi
+    if [ -n "${DEV_S3_BUCKET:-}" ]; then envs="${envs}dev "; fi
+    echo "${envs% }"
+}
+
 show_help() {
+    local available_envs=$(get_available_environments)
+    local default_env=$(echo $available_envs | cut -d' ' -f1)
+    
     echo -e "\033[1m\033[36mCloudFront Log Analysis Tool\033[0m"
     echo ""
     echo -e "\033[33mUSAGE:\033[0m"
@@ -119,7 +130,11 @@ show_help() {
     echo -e "    \033[35m--ip\033[0m         IP address to trace (IP mode only)"
     echo ""
     echo -e "\033[33mOPTIONS:\033[0m"
-    echo -e "    \033[32m--env\033[0m        Environment: prod (default), staging, dev"
+    if [ -n "$available_envs" ]; then
+        echo -e "    \033[32m--env\033[0m        Environment: ${available_envs} (default: ${default_env})"
+    else
+        echo -e "    \033[32m--env\033[0m        Environment: (none configured)"
+    fi
     echo -e "    \033[32m--cache\033[0m      Use smart caching (downloads only missing data)"
     echo -e "    \033[32m--fresh\033[0m      Force fresh download (ignore cache completely)"
     echo ""

@@ -4,14 +4,8 @@ A colorful command-line tool for analyzing AWS CloudFront logs with real-time fi
 
 ## Features
 
-- 🌈 **Real Client IPs**: Shows actual end-user IPs, not edge server IPs
-- 🔍 **Real-time Filtering**: Filter by endpoint and time range
-- 🎯 **IP Tracing**: Special mode to trace specific IP addresses across endpoints
-- 🏗️ **Multi-Environment**: Support for prod, staging, and dev environments  
-- 📊 **Smart Caching**: Caches downloaded logs for faster subsequent queries
-- ⚡ **Efficient Processing**: O(n) performance with optimized filtering
-- 🌈 **Rainbow Headers**: Beautiful colorized output for easy reading
-- 🔒 **Safe Queries**: Always requires timeframe to prevent accidental large data searches
+- **Smart Caching**: Downloads only missing time ranges, reuses existing data
+- **Real Client IPs**: Extracts actual end-user IPs from CloudFront logs
 
 ## Setup
 
