@@ -36,11 +36,15 @@ process_logs() {
       user_agent = $11
       bytes = $4
       
-      # Convert date/time to local time
-      datetime = date " " time
-      cmd = "date -d \"" datetime " UTC\" \"+%H:%M:%S\""
-      cmd | getline local_time
-      close(cmd)
+      # Convert UTC time to local time using systime() and mktime() difference
+      split(date, d, "-"); split(time, t, ":")
+      utc_seconds = mktime(d[1] " " d[2] " " d[3] " " t[1] " " t[2] " " t[3])
+      # Get current time in both UTC and local to find offset
+      now_local = systime()
+      now_utc = mktime(strftime("%Y %m %d %H %M %S", now_local, 1))
+      tz_offset = now_local - now_utc
+      local_seconds = utc_seconds + tz_offset
+      local_time = strftime("%H:%M:%S", local_seconds)
       
       # Decode URL-encoded user agent
       gsub(/%20/, " ", user_agent)
@@ -385,13 +389,28 @@ else
     echo "📁 Found $TOTAL_FILES relevant log files (timestamp >= $CUTOFF_TIME)"
     
     # Download files sequentially to avoid hanging
+    TEMP_DIR=$(mktemp -d)
     TEMP_FILE=$(mktemp)
     
-    echo "$LOG_FILES" | while read -r file; do
-        [ -n "$file" ] && aws s3 cp s3://$S3_BUCKET/$S3_PATH/$file - 2>/dev/null | zcat 2>/dev/null >> "$TEMP_FILE"
-    done
+    # Download files in parallel to temp directory
+    echo "$LOG_FILES" | xargs -I {} -P 20 sh -c 'aws s3 cp "s3://$1/$2/{}" "$3/{}" --no-progress >/dev/null 2>&1' _ "$S3_BUCKET" "$S3_PATH" "$TEMP_DIR" &
     
+    # Show progress while downloading
+    DOWNLOAD_PID=$!
+    while kill -0 $DOWNLOAD_PID 2>/dev/null; do
+        printf "\r📥 Downloading %d files in parallel..." "$TOTAL_FILES" >&2
+        sleep 0.5
+    done
+    wait $DOWNLOAD_PID
     printf "\r📥 Downloaded %d files                    \n" "$TOTAL_FILES" >&2
+    
+    # Decompress and concatenate files sequentially
+    for file in "$TEMP_DIR"/*; do
+        [ -f "$file" ] && zcat "$file" 2>/dev/null >> "$TEMP_FILE"
+    done
+    rm -rf "$TEMP_DIR"
+    
+    printf "\n" >&2
     
     # Update cache
     if [ "$USE_CACHE" = true ]; then
