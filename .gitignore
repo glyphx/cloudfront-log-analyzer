@@ -1,0 +1,16 @@
+# Log files
+*.log
+*_cache.log
+*_logs_*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Configuration files with secrets
+*.conf
+!*.conf.template
+
+# Cache directories
+.cache/
+cache/

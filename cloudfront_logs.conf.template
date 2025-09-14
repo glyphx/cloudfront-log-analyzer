@@ -1,0 +1,19 @@
+# CloudFront Log Analysis Configuration Template
+# Copy this to cloudfront_logs.conf and fill in your actual values
+
+# S3 Bucket Configuration for CloudFront Logs
+# Production Environment
+PROD_S3_BUCKET="your-cloudfront-logs-bucket-prod"
+PROD_S3_PATH="cloudfront-logs/prod"
+
+# Staging Environment  
+STAGING_S3_BUCKET="your-cloudfront-logs-bucket-staging"
+STAGING_S3_PATH="cloudfront-logs/staging"
+
+# Development Environment
+DEV_S3_BUCKET="your-cloudfront-logs-bucket-dev"
+DEV_S3_PATH="cloudfront-logs/dev"
+
+# Cache Configuration
+CACHE_DIR="./cache"
+MAX_CACHE_AGE_HOURS=24
