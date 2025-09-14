@@ -131,9 +131,10 @@ show_help() {
     echo ""
     echo -e "\033[33mOPTIONS:\033[0m"
     if [ -n "$available_envs" ]; then
-        echo -e "    \033[32m--env\033[0m        Environment: ${available_envs} (default: ${default_env})"
+        echo -e "    \033[32m--env\033[0m        Environment: \033[1m\033[35m${available_envs}\033[0m \033[90m(dynamically detected)\033[0m"
+        echo -e "                     Default: \033[1m\033[36m${default_env}\033[0m"
     else
-        echo -e "    \033[32m--env\033[0m        Environment: (none configured)"
+        echo -e "    \033[32m--env\033[0m        Environment: \033[31m(none configured)\033[0m"
     fi
     echo -e "    \033[32m--cache\033[0m      Use smart caching (downloads only missing data)"
     echo -e "    \033[32m--fresh\033[0m      Force fresh download (ignore cache completely)"
