@@ -181,6 +181,11 @@ show_help() {
     echo ""
 }
 
+# Load configuration first
+if [ -f "$CONFIG_FILE" ]; then
+    source "$CONFIG_FILE"
+fi
+
 if [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
     show_help
     exit 0
